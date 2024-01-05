@@ -1,7 +1,7 @@
 //import { modules } from "../../lib.js";
 const baseUrl = import.meta.url;
 import { readBlob, writeBlob } from "../../blobify/src/mod.js";
-import { whatis } from "../../aids/mod.js";
+import { whatis } from "../../aid/whatis/whatis.js";
 
 /* const readBlob = await modules.getModule("readBlob");
 const writeBlob = await modules.getModule("writeBlob");
