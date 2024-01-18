@@ -1,11 +1,6 @@
-//import { modules } from "../../lib.js";
 const baseUrl = import.meta.url;
 import { readBlob, writeBlob } from "../deps.js";
 import { whatis } from "../deps.js";
-
-/* const readBlob = await modules.getModule("readBlob");
-const writeBlob = await modules.getModule("writeBlob");
-const whatis = await modules.getModule("whatis") */
 
 class UserData {
    userDb
@@ -20,7 +15,7 @@ class UserData {
    async refill() {
       console.log('refill start')
       this.userDb = await readBlob(this.userDbPath) ?? new Map;
-      this.idDb = await readBlob(this.idDbPath) ?? new Map; 
+      this.idDb = await readBlob(this.idDbPath) ?? new Map;
       this.userDb.mtime = Deno.lstatSync(this.userDbPath).mtime
       this.idDb.mtime = Deno.lstatSync(this.idDbPath).mtime;
       console.log('refill done')
@@ -36,18 +31,18 @@ class UserData {
    }
 
    async updateUser(name, data) {
-      if (Deno.lstatSync(this.userDbPath).mtime+'' !== ''+this.userDb.mtime) {
+      if (Deno.lstatSync(this.userDbPath).mtime + '' !== '' + this.userDb.mtime) {
          console.log('userDb file mtime is different')
          const result = await this.refill()
          console.log('userDb file updated')
-      } 
+      }
       console.log('user data set')
-      this.userDb.set(name, data); 
+      this.userDb.set(name, data);
       const { id } = data;
       this.idDb.set(id, name);
       this.beingProcess.add(writeBlob(this.userDbPath, this.userDb));
       this.beingProcess.add(writeBlob(this.idDbPath, this.idDb));
-      const r = await Promise.all([...this.beingProcess]); 
+      const r = await Promise.all([...this.beingProcess]);
       console.log('update user done')
       return true;
    }
@@ -84,8 +79,16 @@ class UserData {
       }
       this.userDb.delete(name);
       console.log('deleteUser done')
-      return true;
+      return success(true,`successfully delete ${name}`);
    }
 }
 
 export const userData = new UserData(); 
+
+function success(bool,message,data){
+   return {
+      success: bool,
+      message,
+      ...(data&&{data:data})
+   }
+}
