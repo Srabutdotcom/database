@@ -25,9 +25,9 @@ class UserData {
       console.log('addUser start')
       if (this.beingProcess.size) await Promise.all([...this.beingProcess]);
       this.beingProcess.clear();
-      if (this.userDb.has(name)) return true
-      const result = await this.updateUser(name, data);
+      if (this.userDb.has(name)) return new Status(true,`data ${name} is already in the database`);
       console.log('addUser end')
+      return await this.updateUser(name, data);
    }
 
    async updateUser(name, data) {
@@ -44,7 +44,7 @@ class UserData {
       this.beingProcess.add(writeBlob(this.idDbPath, this.idDb));
       const r = await Promise.all([...this.beingProcess]);
       console.log('update user done')
-      return true;
+      return new Status(true, `Successfully update ${name}'s data`);
    }
 
    async getUser(name) {
@@ -79,16 +79,24 @@ class UserData {
       }
       this.userDb.delete(name);
       console.log('deleteUser done')
-      return success(true,`successfully delete ${name}`);
+      return new Status(true, `successfully delete ${name}`);
    }
 }
 
-export const userData = new UserData(); 
+export const userData = new UserData();
 
-function success(bool,message,data){
+function success(bool, message, data) {
    return {
       success: bool,
       message,
-      ...(data&&{data:data})
+      ...(data && { data: data })
    }
+}
+
+class Status { 
+   constructor(bool, msg, data) { 
+      this.success = bool; 
+      this.message = msg; 
+      if (data) { this.data = data } 
+   } 
 }
